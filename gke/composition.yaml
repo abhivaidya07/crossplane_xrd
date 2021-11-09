@@ -1,0 +1,78 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: compositegkecluster
+  labels:
+    provider: gcp
+spec:
+    compositeTypeRef:
+         apiVersion: compute.example.org/v1alpha1
+         kind: CompositeGkeCluster
+    resources:
+        - name: gkecluster
+          base: 
+           apiVersion: container.gcp.crossplane.io/v1beta1
+           kind: GKECluster
+           spec:
+            forProvider:
+               addonsConfig:
+                networkPolicyConfig:
+                  disabled: false
+               ipAllocationPolicy:
+                useIpAliases: true
+               masterAuth:
+                clientCertificateConfig:
+                  issueClientCertificate: false
+               defaultMaxPodsConstraint:
+                  maxPodsPerNode: 110
+               networkPolicy:
+                  enabled: false
+               resourceLabels:
+                  owner: crossplane
+               podSecurityPolicyConfig:
+                  enabled: false
+            providerConfigRef:
+                  name: default-gcp
+          patches:
+            - fromFieldPath: "spec.parameters.network"
+              toFieldPath: "spec.forProvider.network"
+            - fromFieldPath: "spec.parameters.subnetwork"
+              toFieldPath: "spec.forProvider.subnetwork"
+            - fromFieldPath: "spec.parameters.clusterLocation"
+              toFieldPath: "spec.forProvider.location"
+            - fromFieldPath: "metadata.labels"
+        - name: nodepool
+          base:
+            apiVersion: container.gcp.crossplane.io/v1alpha1
+            kind: NodePool
+            spec:
+              forProvider:
+                autoscaling:
+                  autoprovisioned: false
+                  enabled: false 
+                clusterSelector:
+                  matchControllerRef: true
+                config:
+                  preemptible: true
+                  diskSizeGb: 100
+                  diskType: pd-standard
+                  imageType: COS_CONTAINERD
+                maxPodsConstraint:
+                  maxPodsPerNode: 110
+              providerConfigRef:
+                name: default-gcp
+          patches:
+            - fromFieldPath: "spec.parameters.nodeSize"
+              toFieldPath: "spec.forProvider.config.machineType"
+              transforms:
+                - type: map
+                  map:
+                      small: e2-standard-2
+                      medium: e2-standard-4
+                      large: e2-standard-16
+            - fromFieldPath: "spec.parameters.initialNodeCount"
+              toFieldPath: "spec.forProvider.initialNodeCount"
+            - fromFieldPath: "spec.parameters.nodeLocations"
+              toFieldPath: "spec.forProvider.locations"
+              
+        

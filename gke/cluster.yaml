@@ -1,0 +1,17 @@
+apiVersion: compute.example.org/v1alpha1
+kind: CompositeGkeCluster
+metadata:
+  name: crossplane-composition-cluster
+  namespace: crossplane-system
+  labels:
+      owner: abhivaidya
+spec:
+ compositionRef:
+      name: compositegkecluster
+ parameters:
+  clusterLocation: us-central1-c
+  network: mumbai-team-common-vpc
+  subnetwork: anilgs-gke-us-ct1-subnet
+  nodeSize: small
+  nodeLocations:
+     - "us-central1-c"

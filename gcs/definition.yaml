@@ -1,0 +1,35 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: compositegcsbuckets.storage.example.org
+spec:
+  group: storage.example.org
+  names:
+    kind: CompositeGcsBucket
+    plural: compositegcsbuckets
+  claimNames:
+    kind: GcsBucket
+    plural: gcsbuckets
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              parameters:
+                type: object
+                properties:
+                  location:
+                    description: Location of GCS Bucket
+                    type: string
+                    default: asia
+                required:
+                   - location
+            required:
+              - parameters
+

@@ -1,0 +1,55 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+    name: compositegkeclusters.compute.example.org
+spec:
+  group: compute.example.org
+  names:
+    kind: CompositeGkeCluster
+    plural: compositegkeclusters
+  claimNames:
+    kind: GkeCluster
+    plural: gkeclusters
+  versions:
+   - name: v1alpha1
+     served: true
+     referenceable: true
+     schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              parameters:
+                type: object
+                properties:
+                  nodeSize:
+                     description: The size of the nodes; small, medium, large
+                     type: string
+                     default: small
+                  initialNodeCount:
+                      description: The size of nodepool
+                      type: integer
+                      default: 1
+                  network:
+                      description: The name of VPC
+                      type: string
+                  subnetwork:
+                      description: The name of subnet
+                      type: string
+                  clusterLocation:
+                      description: The name of the Google Compute Engine zone or region in which the cluster resides.
+                      type: string
+                  nodeLocations: 
+                      description: The list of Google Compute Engine zones in which the NodePool's nodes should be located.
+                      items:
+                        type: string
+                      type: array
+                required:
+                  - network
+                  - subnetwork
+                  - clusterLocation
+                  - nodeLocations
+            required:
+               - parameters

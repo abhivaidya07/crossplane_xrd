@@ -1,0 +1,50 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: compositegcsbucket
+  labels:
+    provider: gcp
+spec:
+  compositeTypeRef:
+    apiVersion: storage.example.org/v1alpha1
+    kind: CompositeGcsBucket
+#  patchSets:
+#    - name: external-name
+#      patches:
+#          - type: FromCompositeFieldPath
+#            fromFieldPath: metadata.annotations[crossplane.io/external-name]
+#            policy:
+#              fromFieldPath: Required
+#    - name: metadata-name
+#      patches:
+#         - fromFieldPath: metadata.name
+#           policy:
+#              fromFieldPath: Required
+  resources:
+    - name: gcsbucket
+      base:
+       apiVersion: storage.gcp.crossplane.io/v1alpha3
+       kind: Bucket
+       spec:
+          labels:
+            owner: abhivaidya
+            created: crossplane
+            purpose: composition
+          storageClass: MULTI_REGIONAL
+          providerConfigRef:
+             name: default-gcp
+      patches:
+          - fromFieldPath: metadata.name
+          - fromFieldPath: metadata.annotations[crossplane.io/external-name]
+#          - type: PatchSet
+#            patchSetName: external-name
+          - fromFieldPath: "spec.parameters.location"
+            toFieldPath: "spec.location"
+            transforms:
+            - type: map
+              map:
+                asia: asia
+                states: us
+
+
+

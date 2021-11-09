@@ -1,0 +1,10 @@
+apiVersion: storage.example.org/v1alpha1
+kind: CompositeGcsBucket
+metadata:
+    name: crossplane-abhivaidya-composition
+    namespace: crossplane-system
+spec:
+ compositionRef:
+      name: compositegcsbucket
+ parameters:
+      location: states 
